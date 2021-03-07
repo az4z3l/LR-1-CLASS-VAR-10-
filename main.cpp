@@ -139,7 +139,7 @@ class Triangle
         else if (angle > 0 && angle < 90)
             cout << "This triangle is acute." << endl;
         else
-            cout << "This isn't triangle. He is bad type." << endl;
+            cout << "This isn't triangle. It is a bad type." << endl;
     }
 
     int operator== (Triangle &t)
@@ -167,7 +167,7 @@ int main()
     mytriangle1.allout();
     mytriangle2.allout();
 
-    cout << "[Equalizing copy and triangle.]" << endl;
+    cout << "[Equalizing copy with triangle.]" << endl;
     if(mytriangle1 == mytriangle2)
         cout << "EQUAL" << endl;
 
