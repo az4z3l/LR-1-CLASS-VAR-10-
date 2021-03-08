@@ -20,12 +20,13 @@ class Triangle
 
     public:
 
-    Triangle(double x = 0, double y = 0, double z = 0)
+    Triangle(double x = 3, double y = 4, double z = 90)
     {
         cout << "|I am using constructor. [Triangle(x,y,z)]|" << endl;
-        a = x;
-        b = y;
-        angle = z;
+
+        set_a(x);
+        set_b(y);
+        set_angle(z);
     }
 
     Triangle(const Triangle &t)
@@ -38,11 +39,6 @@ class Triangle
 
     ~Triangle()
     {
-        cout << "|I am destroy the object. [~Triangle()]|" << endl;
-        // WHY? FOR WHAT? JUST TO SUFFER?
-        delete &a;
-        delete &b;
-        delete &angle;
     }
 
     double get_a()
@@ -66,19 +62,46 @@ class Triangle
     void set_a(double x)
     {
         cout << "|I am setting a. [Triangle.set_a()]|" << endl;
-        a = x;
+
+        if(x <= 0)
+        {
+            cout << "Type correct value. [a>0]" << endl;
+            cin >> x;
+            getchar();
+            set_a(x);
+        }
+        else
+            a = x;
     }
 
     void set_b(double x)
     {
         cout << "|I am setting b. [Triangle.set_b()]|" << endl;
-        b = x;
+
+        if(x <= 0)
+        {
+            cout << "Type correct value. [b>0]" << endl;
+            cin >> x;
+            getchar();
+            set_b(x);
+        }
+        else
+            b = x;
     }
 
     void set_angle(double x)
     {
         cout << "|I am setting angle. [Triangle.set_angle()]|" << endl;
-        angle = x;
+
+        if(x <= 0 || x > 179)
+        {
+            cout << "Type correct value. [0<angle<180]" << endl;
+            cin >> x;
+            getchar();
+            set_angle(x);
+        }
+        else
+            angle = x;
     }
 
     void keyboardin()
@@ -114,19 +137,49 @@ class Triangle
     double perimetr()
     {
         cout << "|I am counting perimetr. [Triangle.perimetr()]|" << endl;
-        return side()+a+b;
+
+        if( a <= 0 || b <= 0 || angle <= 0 && angle > 179 )
+        {
+            cout << "Incorrect triangle. Set correct numbers." << endl;
+            return 0;
+        }
+
+        else
+        {
+            return side()+a+b;
+        }
     }
 
     double square()
     {
-        cout << "|I am counting a square. [Triangle.square()]|" << endl;
-        return 0.5*a*b*sin(angle*PI/180);
+         cout << "|I am counting a square. [Triangle.square()]|" << endl;
+
+         if( a <= 0 || b <= 0 || angle <= 0 && angle > 179 )
+        {
+            cout << "Incorrect triangle. Set correct numbers." << endl;
+            return 0;
+        }
+
+        else
+        {
+            return 0.5*a*b*sin(angle*PI/180);
+        }
     }
 
     double height()
     {
         cout << "|I am counting height. [Triangle.perimetr()]|" << endl;
-        return 2*square()/side();
+
+        if( a <= 0 || b <= 0 || angle <= 0 && angle > 179 )
+        {
+            cout << "Incorrect triangle. Set correct numbers." << endl;
+            return 0;
+        }
+
+        else
+        {
+            return 2*square()/side();
+        }
     }
 
     void type()
@@ -142,10 +195,10 @@ class Triangle
             cout << "This isn't triangle. It is a bad type." << endl;
     }
 
-    int operator== (Triangle &t)
+    bool operator== (Triangle &t)
     {
         cout << "|I am complaining. [==]|" << endl;
-        return angle  == t.angle && a == t.a && b == t.b;
+        return angle == t.angle && (a == t.a && b == t.b || a == t.b && b == t.a);
     }
 
 };
