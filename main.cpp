@@ -11,11 +11,19 @@ class Triangle
 
     double a;
     double b;
-    double angle;
-
     double side()
     {
         return sqrt(a*a+b*b-2*a*b*cos(angle*PI/180));
+    }
+
+    double angle;
+    double cos2ndangle()
+    {
+        return (side()*side()+a*a-b*b)/2*side()*a;
+    }
+    double cos3rdangle()
+    {
+        return (side()*side()+b*b-a*a)/2*side()*b;
     }
 
     public:
@@ -65,11 +73,9 @@ class Triangle
 
         if(x <= 0)
         {
-            cout << "Type correct value. [a>0]" << endl;
-            cin >> x;
-            getchar();
-            set_a(x);
+            throw invalid_argument("[a>0]");
         }
+
         else
             a = x;
     }
@@ -80,11 +86,9 @@ class Triangle
 
         if(x <= 0)
         {
-            cout << "Type correct value. [b>0]" << endl;
-            cin >> x;
-            getchar();
-            set_b(x);
+            throw invalid_argument("[b>0]");
         }
+
         else
             b = x;
     }
@@ -93,13 +97,11 @@ class Triangle
     {
         cout << "|I am setting angle. [Triangle.set_angle()]|" << endl;
 
-        if(x <= 0 || x > 179)
+        if(x <= 0 || x >= 180)
         {
-            cout << "Type correct value. [0<angle<180]" << endl;
-            cin >> x;
-            getchar();
-            set_angle(x);
+            throw invalid_argument("[0<angle<180]");
         }
+
         else
             angle = x;
     }
@@ -108,16 +110,53 @@ class Triangle
     {
         cout << "|I am reading the input. [Triangle.keyboardin()]|" << endl;
 
+        double x;
+
         cout << "Triangle's first side: ";
-        cin >> a ;
+
+        while(true)
+        {
+            cin >> x;
+            getchar();
+
+            if(x <= 0)
+                cout << "Type correct value. [a>0]" << endl;
+            else
+                break;
+        }
+
+        set_a(x);
 
         cout << "Triangle's second side: ";
-        cin >> b ;
+
+        while(true)
+        {
+            cin >> x;
+            getchar();
+
+            if(x <= 0)
+                cout << "Type correct value. [b>0]" << endl;
+            else
+                break;
+        }
+
+        set_b(x);
+
 
         cout << "Triangle's angle: ";
-        cin >> angle ;
 
-        getchar();
+        while(true)
+        {
+            cin >> x;
+            getchar();
+
+            if(x <= 0 || x >= 180)
+                cout << "Type correct value. [0<angle<180]" << endl;
+            else
+                break;
+        }
+
+        set_angle(x);
     }
 
     void allout()
@@ -138,58 +177,31 @@ class Triangle
     {
         cout << "|I am counting perimetr. [Triangle.perimetr()]|" << endl;
 
-        if( a <= 0 || b <= 0 || angle <= 0 && angle > 179 )
-        {
-            cout << "Incorrect triangle. Set correct numbers." << endl;
-            return 0;
-        }
-
-        else
-        {
-            return side()+a+b;
-        }
+        return side()+a+b;
     }
 
     double square()
     {
          cout << "|I am counting a square. [Triangle.square()]|" << endl;
 
-         if( a <= 0 || b <= 0 || angle <= 0 && angle > 179 )
-        {
-            cout << "Incorrect triangle. Set correct numbers." << endl;
-            return 0;
-        }
-
-        else
-        {
-            return 0.5*a*b*sin(angle*PI/180);
-        }
+         return 0.5*a*b*sin(angle*PI/180);
     }
 
     double height()
     {
         cout << "|I am counting height. [Triangle.perimetr()]|" << endl;
 
-        if( a <= 0 || b <= 0 || angle <= 0 && angle > 179 )
-        {
-            cout << "Incorrect triangle. Set correct numbers." << endl;
-            return 0;
-        }
-
-        else
-        {
-            return 2*square()/side();
-        }
+        return 2*square()/side();
     }
 
     void type()
     {
         cout << "|I am finding his type. [Triangle.type()]|" << endl;
-        if (angle == 90)
+        if (angle == 90 || cos2ndangle() == 0 || cos3rdangle() == 0)
             cout << "This triangle is right." << endl;
-        else if (angle < 180 && angle > 90)
+        else if (angle < 180 && angle > 90 || cos2ndangle() < 0 || cos3rdangle() < 0)
             cout << "This triangle is obtuse." << endl;
-        else if (angle > 0 && angle < 90)
+        else if (angle > 0 && angle < 90 && cos2ndangle() > 0 && cos3rdangle() > 0)
             cout << "This triangle is acute." << endl;
         else
             cout << "This isn't triangle. It is a bad type." << endl;
@@ -198,7 +210,7 @@ class Triangle
     bool operator== (Triangle &t)
     {
         cout << "|I am complaining. [==]|" << endl;
-        return angle == t.angle && (a == t.a && b == t.b || a == t.b && b == t.a);
+        return (a == t.a || a == t.b || a == t.side()) && (b == t.a || b == t.b || b == t.side()) && (this->side() == t.a || this->side() == t.b || this->side() == t.side());
     }
 
 };
@@ -220,10 +232,6 @@ int main()
     mytriangle1.allout();
     mytriangle2.allout();
 
-    cout << "[Equalizing copy with triangle.]" << endl;
-    if(mytriangle1 == mytriangle2)
-        cout << "EQUAL" << endl;
-
     cout << "Press to continue..." << endl;
     getchar();
 
@@ -231,8 +239,11 @@ int main()
 
     do
     {
-        cout << "1st triangle:" << endl;
+        cout << "[1st triangle:]" << endl;
         mytriangle1.allout();
+
+        cout << "[2nd triangle:]" << endl;
+        mytriangle2.allout();
 
         cout << "CHOOSE METHODE:" << endl;
         cout << "[1]     Get 1st side    [1]" << endl;
@@ -241,12 +252,14 @@ int main()
         cout << "[4]     Set 1st side    [4]" << endl;
         cout << "[5]     Set 2nd side    [5]" << endl;
         cout << "[6]       Set angle     [6]" << endl;
-        cout << "[7]    Keyboard input   [7]" << endl;
-        cout << "[8]       Perimetr      [8]" << endl;
-        cout << "[9]        Square       [9]" << endl;
-        cout << "[10]       Height       [10]" << endl;
-        cout << "[11]        Type        [11]" << endl;
-        cout << "[12]        Exit        [12]" << endl;
+        cout << "[7]  1st triangle(Keyb.)[7]" << endl;
+        cout << "[8]  2nd triangle(Keyb.)[8]" << endl;
+        cout << "[9]  Complain triangles [9]" << endl;
+        cout << "[10]      Perimetr      [10]" << endl;
+        cout << "[11]       Square       [11]" << endl;
+        cout << "[12]       Height       [12]" << endl;
+        cout << "[13]        Type        [13]" << endl;
+        cout << "[14]        Exit        [14]" << endl;
 
         cin >> choice;
         getchar();
@@ -267,22 +280,46 @@ int main()
 
             case 4:
             double fs;
-            cin >> fs;
-            getchar();
+            while(true)
+            {
+                cin >> fs;
+                getchar();
+
+                if(fs <= 0)
+                    cout << "Type correct value. [a>0]" << endl;
+                else
+                    break;
+            }
             mytriangle1.set_a(fs);
             break;
 
             case 5:
             double ss;
-            cin >> ss;
-            getchar();
+            while(true)
+            {
+                cin >> ss;
+                getchar();
+
+                if(ss <= 0)
+                    cout << "Type correct value. [b>0]" << endl;
+                else
+                    break;
+            }
             mytriangle1.set_b(ss);
             break;
 
             case 6:
             double tangle;
-            cin >> tangle;
-            getchar();
+            while(true)
+            {
+                cin >> tangle;
+                getchar();
+
+                if(tangle <= 0 || tangle >= 180)
+                    cout << "Type correct value. [0<angle<180]" << endl;
+                else
+                    break;
+            }
             mytriangle1.set_angle(tangle);
             break;
 
@@ -291,22 +328,36 @@ int main()
             break;
 
             case 8:
-            cout << mytriangle1.perimetr() << endl;
+            mytriangle2.keyboardin();
             break;
 
             case 9:
-            cout << mytriangle1.square() << endl;
+
+            if(mytriangle1 == mytriangle2)
+                cout << "EQUAL" << endl;
+
+            else
+                cout << "NON-EQUAL" << endl;
+
             break;
 
             case 10:
-            cout << mytriangle1.height() << endl;
+            cout << mytriangle1.perimetr() << endl;
             break;
 
             case 11:
-            mytriangle1.type();
+            cout << mytriangle1.square() << endl;
             break;
 
             case 12:
+            cout << mytriangle1.height() << endl;
+            break;
+
+            case 13:
+            mytriangle1.type();
+            break;
+
+            case 14:
             break;
         }
 
@@ -315,9 +366,7 @@ int main()
 
         system("CLS");
 
-    }while(choice != 12);
+    }while(choice != 14);
 
     return 0;
 }
-
-
